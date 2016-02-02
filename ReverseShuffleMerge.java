@@ -11,7 +11,7 @@ public class Solution {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
-            it.remove(); // avoids a ConcurrentModificationException
+            //it.remove(); // avoids a ConcurrentModificationException
         }
     }
 
@@ -31,9 +31,11 @@ public class Solution {
             }
         }
         //printMap(loc);
+        //System.out.println(Arrays.toString(ct) );
         for(int i=0; i<26;i++){
             ori[i] = ct[i]/2;
         }
+        //System.out.println(Arrays.toString(ori) );
         PriorityQueue<Character> q = new PriorityQueue<>();
         for(int i=0; i<26;i++){
             if(ori[i] > 0) {
@@ -41,29 +43,32 @@ public class Solution {
                     q.add( (char) (i + 'a') );
             } 
         }
-        Queue<Character> ans = new LinkedList<>();
+        List<Character> ans = new ArrayList<>();
         int oriLen = str.length()/2;
         for(int i=str.length()-1; i>=0;i--){
             char c = str.charAt(i);
             if (ori[c -'a'] == 0) continue;
+            if (oriLen == 0) break;
             //if (loc.get(c) == null) System.out.println( "null: " + Integer.toString(i));
             // if current smallest use it
+            int size = loc.get(c).size();
             if(c == q.peek()) {
                 q.remove(c);
                 ans.add(c);
+                oriLen--;
                 ori[c -'a']--;
                 loc.get(c).remove(i);
-            }
+            }                 
             // we cannot neglect this
-            int size = loc.get(c).size();
-            if(size == ori[c -'a']) {
+            else if(size == ori[c -'a']) {
                 q.remove(c);
                 ans.add(c);
+                oriLen--;
                 ori[c -'a']--;
                 loc.get(c).remove(i);
             }
             // we can neglect
-            if(size > ori[c -'a']) {
+            else if(size > ori[c -'a']) {
                 loc.get(c).remove(i);
             }
         }
