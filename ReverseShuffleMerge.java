@@ -6,12 +6,22 @@ import java.util.regex.*;
 
 public class Solution {
     
-    public static void printMap(Map mp) {
-        Iterator it = mp.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
+    public static void differWhere(String str1, String str2) {
+        if(str1.length() != str2.length()) {
+            System.out.println("oh crap");
+            return;
         }
+        int cnt  = 0;
+        for(int i=0; i<str1.length();i++){
+            char c = str1.charAt(i);
+            char d = str2.charAt(i);
+            
+            if(c != d) {
+                System.out.format("\nPos = %s, str1 = %s, str2 = %s\n", i, c, d);
+                cnt++;
+            }
+        }
+        System.out.format("Total Differences = %s\n", cnt);
     }
     
     public static void printCount(String str) {
@@ -31,24 +41,17 @@ public class Solution {
         //String actAns = in.nextLine();
         int[] ct = new int[26];
         int[] ori = new int[26];
-        Map<Character, Set<Integer>> loc = new HashMap<Character, Set<Integer>>();
         for(int i=0; i<str.length();i++){
             char c = str.charAt(i);
             ct[c -'a'] += 1;
-            if(loc.containsKey(c)) loc.get(c).add(i);
-            else { 
-                loc.put(c, (new HashSet<Integer>()) ) ;
-                loc.get(c).add(i);
-            }
         }
-        //printMap(loc);
         //System.out.println(Arrays.toString(ct) );
         for(int i=0; i<26;i++){
             ori[i] = ct[i]/2;
         }
         //System.out.println(Arrays.toString(ori) );
         //printCount(actAns);
-        PriorityQueue<Character> q = new PriorityQueue<>();
+        PriorityQueue<Character> q = new PriorityQueue<>(); // to find the current minimum each time
         for(int i=0; i<26;i++){
             if(ori[i] > 0) {
                 for(int j=0; j<ori[i]; j++)
@@ -63,29 +66,29 @@ public class Solution {
             if (ori[c -'a'] == 0) continue;
             if (oriLen == 0) break;
             // if current smallest use it
-            //int size = loc.get(c).size();
             boolean toAdd = false;
             if(c == q.peek()) {
                 toAdd = true;
-                //loc.get(c).remove(i);
             }                 
             // we cannot neglect this
             else if(ct[c -'a'] == ori[c -'a']) {
                 toAdd = true;
-                //loc.get(c).remove(i);
             }
             // select a character "c" if next critical character turns out to be larger than "c". 
             else if(ct[c -'a'] > ori[c -'a']) {
+                int[] tempct = Arrays.copyOf(ct, 26); // temporary array to store count, to find criticality, because it needs to subtracted when visited each time
                 // look ahead in the string
                 for(int j = i-1; j>=0; j--){
                     char cj = str.charAt(j);
                     if (ori[cj -'a'] == 0) continue;
-                    if( (((int)cj) < ((int)c)) ) { break; } // further ahead there is a lesser(selectable) character so no need to select this
-                    if( (ori[cj -'a'] == ct[cj -'a']) ) {
-                        if(((int)cj) > ((int)c) ) {
+                    if( (cj-c) < 0 ) {break;}// further ahead there is a lesser(selectable) character so no need to select this
+                    // a crtical character futher ahead is great than this character so may need to select this 
+                    if ((cj-c) > 0) {
+                        if( (ori[cj -'a'] == tempct[cj -'a']) ) {
                             toAdd = true;
                             break;
                         }
+                        tempct[cj -'a']--;
                     }
                 }
             }
@@ -98,10 +101,8 @@ public class Solution {
             ct[c -'a']--;
         }
         System.out.println(sb.toString());
+        //differWhere(actAns, sb.toString());
         //printCount(sb.toString());
-        /*
-        for(char c: ans)
-            System.out.print(c);
-            */
+        
     }
 }
